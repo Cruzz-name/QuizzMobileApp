@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/answer_button.dart';
 import 'package:myapp/data/quizz.dart';
+import 'package:myapp/result_screen.dart';
 
 class QuestionsScreen extends StatefulWidget {
   const QuestionsScreen({super.key});
@@ -12,13 +13,27 @@ class QuestionsScreen extends StatefulWidget {
 }
 
 class _QuestionsScreenState extends State<QuestionsScreen> {
+  
   int currentQuestionIndex = 0;
+  final List<String> selectedAnswers = [];
 
-  void answerQuestiong(){
-    setState((){
-      currentQuestionIndex++;
+  void answerQuestion(String answers) {
+    setState(() {
+      selectedAnswers.add(answers);
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+      } else {
+        // เมื่อถึงคำถามสุดท้าย ให้ไปหน้าผลลัพธ์
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => 
+            ResultScreen(selectedAnswers: selectedAnswers),
+          ),
+        );
+      }
     });
-  }
+}
   
   @override
   Widget build(BuildContext context) {
@@ -52,8 +67,11 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                   const SizedBox(height: 30),
                   ...currentQuestion.getShuffledAnswers().map(
                     (answer){
-                    return AnswerButton(answer: answer, onTap: answerQuestiong,);
-                  })
+                    return AnswerButton(
+                      answer: answer, 
+                      onTap:() => answerQuestion(answer));
+                  },
+                  )
                 ],
               ),
             ),
